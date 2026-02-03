@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -37,22 +37,11 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/key.pem
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/key.pem
           chmod 600 ~/.ssh/key.pem
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      # 6️⃣ Debug SSH key (temporary, remove later)
-      - name: Debug SSH key
-        run: |
-          ls -la ~/.ssh
-          file ~/.ssh/key.pem
-          head -n 1 ~/.ssh/key.pem
-
-      # 7️⃣ DNS check
-      - name: Check host resolution
-        run: nslookup "${{ secrets.EC2_HOST }}"
-
-      # 8️⃣ Deploy to EC2
+      # 6️⃣ Deploy to EC2
       - name: Deploy application
         run: |
           ssh -T \
