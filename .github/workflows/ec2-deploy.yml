@@ -39,7 +39,7 @@ jobs:
            run: npm install --frozen-lockfile
 
          - name: Build Project
-           run: npm build
+           run: npm run build
 
            # Configure SSH
          - name: Configure SSH
