@@ -3,7 +3,7 @@ const app = express()
 
 
 app.get('/', (req : Request, res : Response) => {
-  res.send('Hello World!!!!!@@dcd#')
+  res.send('Hello World!!!!!@@dcd# , aws deploy done')
 })
 
 
