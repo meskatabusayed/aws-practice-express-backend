@@ -14,44 +14,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      # 3️⃣ Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 4️⃣ Build project
+      # Build project
       - name: Build project
         run: npm run build
 
-      # 5️⃣ Configure SSH
+      # Configure SSH
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/key.pem
+          printf "%s\n" "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/key.pem
           chmod 600 ~/.ssh/key.pem
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
-      # 6️⃣ Deploy to EC2
+      # Deploy to EC2
       - name: Deploy application
         run: |
-          ssh -T \
-              -o StrictHostKeyChecking=no \
+          ssh -o StrictHostKeyChecking=no \
               -o ConnectTimeout=30 \
               -i ~/.ssh/key.pem \
-              "${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}" << 'EOF'
+              ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << EOF
 
             set -e
-
             echo "🚀 Deployment started"
 
             cd /home/ubuntu/app || exit 1
@@ -69,7 +67,6 @@ jobs:
             pm2 reload app || pm2 start dist/server.js --name app
 
             pm2 save
-
             echo "✅ Deployment successful"
 
           EOF
